@@ -1,5 +1,3 @@
-# data-enrichment-loading-large-files-with-low-ram
- 
 # Processing Large Files with Low RAM
 
 ## Problem
@@ -56,7 +54,7 @@ df_reader
 
 
 
-    <pandas.io.parsers.readers.TextFileReader at 0x137946fd0>
+    <pandas.io.parsers.readers.TextFileReader at 0x106670e80>
 
 
 
@@ -88,9 +86,175 @@ temp_df
 ```
 
 
-    
-![png](Images/output_9_0.png)
-    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>tconst</th>
+      <th>titleType</th>
+      <th>primaryTitle</th>
+      <th>originalTitle</th>
+      <th>isAdult</th>
+      <th>startYear</th>
+      <th>endYear</th>
+      <th>runtimeMinutes</th>
+      <th>genres</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>tt0000001</td>
+      <td>short</td>
+      <td>Carmencita</td>
+      <td>Carmencita</td>
+      <td>0</td>
+      <td>1894</td>
+      <td>\N</td>
+      <td>1</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>tt0000002</td>
+      <td>short</td>
+      <td>Le clown et ses chiens</td>
+      <td>Le clown et ses chiens</td>
+      <td>0</td>
+      <td>1892</td>
+      <td>\N</td>
+      <td>5</td>
+      <td>Animation,Short</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>tt0000003</td>
+      <td>short</td>
+      <td>Pauvre Pierrot</td>
+      <td>Pauvre Pierrot</td>
+      <td>0</td>
+      <td>1892</td>
+      <td>\N</td>
+      <td>4</td>
+      <td>Animation,Comedy,Romance</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>tt0000004</td>
+      <td>short</td>
+      <td>Un bon bock</td>
+      <td>Un bon bock</td>
+      <td>0</td>
+      <td>1892</td>
+      <td>\N</td>
+      <td>12</td>
+      <td>Animation,Short</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>tt0000005</td>
+      <td>short</td>
+      <td>Blacksmith Scene</td>
+      <td>Blacksmith Scene</td>
+      <td>0</td>
+      <td>1893</td>
+      <td>\N</td>
+      <td>1</td>
+      <td>Comedy,Short</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>99995</th>
+      <td>tt0102317</td>
+      <td>movie</td>
+      <td>Little Noises</td>
+      <td>Little Noises</td>
+      <td>0</td>
+      <td>1991</td>
+      <td>\N</td>
+      <td>73</td>
+      <td>Comedy,Drama</td>
+    </tr>
+    <tr>
+      <th>99996</th>
+      <td>tt0102318</td>
+      <td>tvMovie</td>
+      <td>A Little Piece of Heaven</td>
+      <td>A Little Piece of Heaven</td>
+      <td>0</td>
+      <td>1991</td>
+      <td>\N</td>
+      <td>110</td>
+      <td>Crime,Drama,Family</td>
+    </tr>
+    <tr>
+      <th>99997</th>
+      <td>tt0102319</td>
+      <td>movie</td>
+      <td>A Little Stiff</td>
+      <td>A Little Stiff</td>
+      <td>0</td>
+      <td>1991</td>
+      <td>\N</td>
+      <td>86</td>
+      <td>Comedy</td>
+    </tr>
+    <tr>
+      <th>99998</th>
+      <td>tt0102320</td>
+      <td>short</td>
+      <td>A Little Vicious</td>
+      <td>A Little Vicious</td>
+      <td>0</td>
+      <td>1991</td>
+      <td>\N</td>
+      <td>30</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>99999</th>
+      <td>tt0102321</td>
+      <td>movie</td>
+      <td>Liao zhai: Hua nong yue</td>
+      <td>Liao zhai: Hua nong yue</td>
+      <td>0</td>
+      <td>1991</td>
+      <td>\N</td>
+      <td>93</td>
+      <td>\N</td>
+    </tr>
+  </tbody>
+</table>
+<p>100000 rows × 9 columns</p>
+</div>
+
 
 
 - We should now have an updated currrow that reflects we have already grabbed rows 0 through 99_999.
@@ -120,40 +284,363 @@ temp_df.replace({'\\N':np.nan},inplace=True)
 temp_df = temp_df.dropna(subset=['runtimeMinutes','genres','startYear'])
 ```
 
-
-```python
-## keep only titleType==Movie
-temp_df = temp_df.loc[ temp_df['titleType']=='movie']
-```
-
-
-```python
-## Eliminate movies that include  "Documentary" in genre 
-is_documentary = temp_df['genres'].str.contains('documentary',case=False)
-temp_df = temp_df[~is_documentary]
-temp_df.head()
-```
-
-
-    
-![png](Images/output_15_0.png)
-    
-
+> Note: there are additional required filtering steps for the assignment that should should be included here in your own notebook.
 
 
 ```python
 ### Convert startyear to numeric for slicing
-temp_df['startYear'] = temp_df['startYear'].astype(float)
+temp_df['startYear'] = temp_df['startYear'].astype(float).copy()
 
 ## keep startYear 2000-2022
 temp_df = temp_df[(temp_df['startYear']>=2000)&(temp_df['startYear']<2022)]
 temp_df
 ```
 
+    /var/folders/rf/vw4r41jd7vd95x1w0dth7v9h0000gp/T/ipykernel_3151/2128585443.py:2: SettingWithCopyWarning: 
+    A value is trying to be set on a copy of a slice from a DataFrame.
+    Try using .loc[row_indexer,col_indexer] = value instead
+    
+    See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+      temp_df['startYear'] = temp_df['startYear'].astype(float).copy()
 
-    
-![png](Images/output_16_0.png)
-    
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>tconst</th>
+      <th>titleType</th>
+      <th>primaryTitle</th>
+      <th>originalTitle</th>
+      <th>isAdult</th>
+      <th>startYear</th>
+      <th>endYear</th>
+      <th>runtimeMinutes</th>
+      <th>genres</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>13079</th>
+      <td>tt0013274</td>
+      <td>movie</td>
+      <td>Istoriya grazhdanskoy voyny</td>
+      <td>Istoriya grazhdanskoy voyny</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>133</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>33790</th>
+      <td>tt0034413</td>
+      <td>short</td>
+      <td>Youth Gets a Break</td>
+      <td>Youth Gets a Break</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>20</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>34790</th>
+      <td>tt0035423</td>
+      <td>movie</td>
+      <td>Kate &amp; Leopold</td>
+      <td>Kate &amp; Leopold</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>118</td>
+      <td>Comedy,Fantasy,Romance</td>
+    </tr>
+    <tr>
+      <th>39532</th>
+      <td>tt0040241</td>
+      <td>short</td>
+      <td>Color Rhapsodie</td>
+      <td>Color Rhapsodie</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>43536</th>
+      <td>tt0044326</td>
+      <td>short</td>
+      <td>Abstronic</td>
+      <td>Abstronic</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>44078</th>
+      <td>tt0044879</td>
+      <td>short</td>
+      <td>Mandala</td>
+      <td>Mandala</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>3</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>55738</th>
+      <td>tt0056840</td>
+      <td>short</td>
+      <td>Aufsätze</td>
+      <td>Aufsätze</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>10</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>59185</th>
+      <td>tt0060366</td>
+      <td>short</td>
+      <td>A Embalagem de Vidro</td>
+      <td>A Embalagem de Vidro</td>
+      <td>0</td>
+      <td>2020.0</td>
+      <td>NaN</td>
+      <td>11</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>61089</th>
+      <td>tt0062336</td>
+      <td>movie</td>
+      <td>The Tango of the Widower and Its Distorting Mi...</td>
+      <td>El Tango del Viudo y Su Espejo Deformante</td>
+      <td>0</td>
+      <td>2020.0</td>
+      <td>NaN</td>
+      <td>70</td>
+      <td>Drama</td>
+    </tr>
+    <tr>
+      <th>63720</th>
+      <td>tt0065047</td>
+      <td>short</td>
+      <td>The Sun's Gonna Shine</td>
+      <td>The Sun's Gonna Shine</td>
+      <td>0</td>
+      <td>2014.0</td>
+      <td>NaN</td>
+      <td>10</td>
+      <td>Documentary,Music,Short</td>
+    </tr>
+    <tr>
+      <th>65857</th>
+      <td>tt0067230</td>
+      <td>short</td>
+      <td>I Miss Sonia Henie</td>
+      <td>I Miss Sonia Henie</td>
+      <td>0</td>
+      <td>2009.0</td>
+      <td>NaN</td>
+      <td>20</td>
+      <td>Comedy,Short</td>
+    </tr>
+    <tr>
+      <th>66247</th>
+      <td>tt0067626</td>
+      <td>short</td>
+      <td>Before the Rally</td>
+      <td>Przed rajdem</td>
+      <td>0</td>
+      <td>2006.0</td>
+      <td>NaN</td>
+      <td>16</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>66304</th>
+      <td>tt0067683</td>
+      <td>movie</td>
+      <td>Workers '71: Nothing About Us Without Us</td>
+      <td>Robotnicy 1971 - Nic o nas bez nas</td>
+      <td>0</td>
+      <td>2006.0</td>
+      <td>NaN</td>
+      <td>47</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>67531</th>
+      <td>tt0068943</td>
+      <td>short</td>
+      <td>Between Wroclaw and Zielona Góra</td>
+      <td>Miedzy Wroclawiem a Zielona Góra</td>
+      <td>0</td>
+      <td>2010.0</td>
+      <td>NaN</td>
+      <td>11</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>67635</th>
+      <td>tt0069049</td>
+      <td>movie</td>
+      <td>The Other Side of the Wind</td>
+      <td>The Other Side of the Wind</td>
+      <td>0</td>
+      <td>2018.0</td>
+      <td>NaN</td>
+      <td>122</td>
+      <td>Drama</td>
+    </tr>
+    <tr>
+      <th>70534</th>
+      <td>tt0072043</td>
+      <td>short</td>
+      <td>X-Ray</td>
+      <td>Przeswietlenie</td>
+      <td>0</td>
+      <td>2006.0</td>
+      <td>NaN</td>
+      <td>13</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>77929</th>
+      <td>tt0079644</td>
+      <td>movie</td>
+      <td>November 1828</td>
+      <td>November 1828</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>140</td>
+      <td>Drama,War</td>
+    </tr>
+    <tr>
+      <th>86766</th>
+      <td>tt0088751</td>
+      <td>movie</td>
+      <td>The Naked Monster</td>
+      <td>The Naked Monster</td>
+      <td>0</td>
+      <td>2005.0</td>
+      <td>NaN</td>
+      <td>100</td>
+      <td>Comedy,Horror,Sci-Fi</td>
+    </tr>
+    <tr>
+      <th>87078</th>
+      <td>tt0089067</td>
+      <td>movie</td>
+      <td>El día de los albañiles 2</td>
+      <td>El día de los albañiles 2</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>90</td>
+      <td>Comedy</td>
+    </tr>
+    <tr>
+      <th>87435</th>
+      <td>tt0089435</td>
+      <td>short</td>
+      <td>Kokoa</td>
+      <td>Kokoa</td>
+      <td>0</td>
+      <td>2019.0</td>
+      <td>NaN</td>
+      <td>13</td>
+      <td>Animation,Short</td>
+    </tr>
+    <tr>
+      <th>90881</th>
+      <td>tt0092960</td>
+      <td>movie</td>
+      <td>En tres y dos</td>
+      <td>En tres y dos</td>
+      <td>0</td>
+      <td>2004.0</td>
+      <td>NaN</td>
+      <td>102</td>
+      <td>Drama</td>
+    </tr>
+    <tr>
+      <th>92731</th>
+      <td>tt0094859</td>
+      <td>movie</td>
+      <td>Chief Zabu</td>
+      <td>Chief Zabu</td>
+      <td>0</td>
+      <td>2016.0</td>
+      <td>NaN</td>
+      <td>74</td>
+      <td>Comedy</td>
+    </tr>
+    <tr>
+      <th>93902</th>
+      <td>tt0096056</td>
+      <td>movie</td>
+      <td>Crime and Punishment</td>
+      <td>Crime and Punishment</td>
+      <td>0</td>
+      <td>2002.0</td>
+      <td>NaN</td>
+      <td>126</td>
+      <td>Drama</td>
+    </tr>
+    <tr>
+      <th>95113</th>
+      <td>tt0097304</td>
+      <td>movie</td>
+      <td>Everything's for You</td>
+      <td>Everything's for You</td>
+      <td>0</td>
+      <td>2009.0</td>
+      <td>NaN</td>
+      <td>58</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>98005</th>
+      <td>tt0100275</td>
+      <td>movie</td>
+      <td>The Wandering Soap Opera</td>
+      <td>La Telenovela Errante</td>
+      <td>0</td>
+      <td>2017.0</td>
+      <td>NaN</td>
+      <td>80</td>
+      <td>Comedy,Drama,Fantasy</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 
 - Now, save the filtered dataframe to disk, using the chunk # in the filename.
@@ -199,9 +686,368 @@ pd.read_csv(fname)
 ```
 
 
-    
-![png](Images/output_22_0.png)
-    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Unnamed: 0</th>
+      <th>tconst</th>
+      <th>titleType</th>
+      <th>primaryTitle</th>
+      <th>originalTitle</th>
+      <th>isAdult</th>
+      <th>startYear</th>
+      <th>endYear</th>
+      <th>runtimeMinutes</th>
+      <th>genres</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>13079</td>
+      <td>tt0013274</td>
+      <td>movie</td>
+      <td>Istoriya grazhdanskoy voyny</td>
+      <td>Istoriya grazhdanskoy voyny</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>133</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>33790</td>
+      <td>tt0034413</td>
+      <td>short</td>
+      <td>Youth Gets a Break</td>
+      <td>Youth Gets a Break</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>20</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>34790</td>
+      <td>tt0035423</td>
+      <td>movie</td>
+      <td>Kate &amp; Leopold</td>
+      <td>Kate &amp; Leopold</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>118</td>
+      <td>Comedy,Fantasy,Romance</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>39532</td>
+      <td>tt0040241</td>
+      <td>short</td>
+      <td>Color Rhapsodie</td>
+      <td>Color Rhapsodie</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>43536</td>
+      <td>tt0044326</td>
+      <td>short</td>
+      <td>Abstronic</td>
+      <td>Abstronic</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>44078</td>
+      <td>tt0044879</td>
+      <td>short</td>
+      <td>Mandala</td>
+      <td>Mandala</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>3</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>55738</td>
+      <td>tt0056840</td>
+      <td>short</td>
+      <td>Aufsätze</td>
+      <td>Aufsätze</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>10</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>59185</td>
+      <td>tt0060366</td>
+      <td>short</td>
+      <td>A Embalagem de Vidro</td>
+      <td>A Embalagem de Vidro</td>
+      <td>0</td>
+      <td>2020.0</td>
+      <td>NaN</td>
+      <td>11</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>61089</td>
+      <td>tt0062336</td>
+      <td>movie</td>
+      <td>The Tango of the Widower and Its Distorting Mi...</td>
+      <td>El Tango del Viudo y Su Espejo Deformante</td>
+      <td>0</td>
+      <td>2020.0</td>
+      <td>NaN</td>
+      <td>70</td>
+      <td>Drama</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>63720</td>
+      <td>tt0065047</td>
+      <td>short</td>
+      <td>The Sun's Gonna Shine</td>
+      <td>The Sun's Gonna Shine</td>
+      <td>0</td>
+      <td>2014.0</td>
+      <td>NaN</td>
+      <td>10</td>
+      <td>Documentary,Music,Short</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>65857</td>
+      <td>tt0067230</td>
+      <td>short</td>
+      <td>I Miss Sonia Henie</td>
+      <td>I Miss Sonia Henie</td>
+      <td>0</td>
+      <td>2009.0</td>
+      <td>NaN</td>
+      <td>20</td>
+      <td>Comedy,Short</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>66247</td>
+      <td>tt0067626</td>
+      <td>short</td>
+      <td>Before the Rally</td>
+      <td>Przed rajdem</td>
+      <td>0</td>
+      <td>2006.0</td>
+      <td>NaN</td>
+      <td>16</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>66304</td>
+      <td>tt0067683</td>
+      <td>movie</td>
+      <td>Workers '71: Nothing About Us Without Us</td>
+      <td>Robotnicy 1971 - Nic o nas bez nas</td>
+      <td>0</td>
+      <td>2006.0</td>
+      <td>NaN</td>
+      <td>47</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>67531</td>
+      <td>tt0068943</td>
+      <td>short</td>
+      <td>Between Wroclaw and Zielona Góra</td>
+      <td>Miedzy Wroclawiem a Zielona Góra</td>
+      <td>0</td>
+      <td>2010.0</td>
+      <td>NaN</td>
+      <td>11</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>67635</td>
+      <td>tt0069049</td>
+      <td>movie</td>
+      <td>The Other Side of the Wind</td>
+      <td>The Other Side of the Wind</td>
+      <td>0</td>
+      <td>2018.0</td>
+      <td>NaN</td>
+      <td>122</td>
+      <td>Drama</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>70534</td>
+      <td>tt0072043</td>
+      <td>short</td>
+      <td>X-Ray</td>
+      <td>Przeswietlenie</td>
+      <td>0</td>
+      <td>2006.0</td>
+      <td>NaN</td>
+      <td>13</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>77929</td>
+      <td>tt0079644</td>
+      <td>movie</td>
+      <td>November 1828</td>
+      <td>November 1828</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>140</td>
+      <td>Drama,War</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>86766</td>
+      <td>tt0088751</td>
+      <td>movie</td>
+      <td>The Naked Monster</td>
+      <td>The Naked Monster</td>
+      <td>0</td>
+      <td>2005.0</td>
+      <td>NaN</td>
+      <td>100</td>
+      <td>Comedy,Horror,Sci-Fi</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>87078</td>
+      <td>tt0089067</td>
+      <td>movie</td>
+      <td>El día de los albañiles 2</td>
+      <td>El día de los albañiles 2</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>90</td>
+      <td>Comedy</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>87435</td>
+      <td>tt0089435</td>
+      <td>short</td>
+      <td>Kokoa</td>
+      <td>Kokoa</td>
+      <td>0</td>
+      <td>2019.0</td>
+      <td>NaN</td>
+      <td>13</td>
+      <td>Animation,Short</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>90881</td>
+      <td>tt0092960</td>
+      <td>movie</td>
+      <td>En tres y dos</td>
+      <td>En tres y dos</td>
+      <td>0</td>
+      <td>2004.0</td>
+      <td>NaN</td>
+      <td>102</td>
+      <td>Drama</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>92731</td>
+      <td>tt0094859</td>
+      <td>movie</td>
+      <td>Chief Zabu</td>
+      <td>Chief Zabu</td>
+      <td>0</td>
+      <td>2016.0</td>
+      <td>NaN</td>
+      <td>74</td>
+      <td>Comedy</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>93902</td>
+      <td>tt0096056</td>
+      <td>movie</td>
+      <td>Crime and Punishment</td>
+      <td>Crime and Punishment</td>
+      <td>0</td>
+      <td>2002.0</td>
+      <td>NaN</td>
+      <td>126</td>
+      <td>Drama</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>95113</td>
+      <td>tt0097304</td>
+      <td>movie</td>
+      <td>Everything's for You</td>
+      <td>Everything's for You</td>
+      <td>0</td>
+      <td>2009.0</td>
+      <td>NaN</td>
+      <td>58</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>98005</td>
+      <td>tt0100275</td>
+      <td>movie</td>
+      <td>The Wandering Soap Opera</td>
+      <td>La Telenovela Errante</td>
+      <td>0</td>
+      <td>2017.0</td>
+      <td>NaN</td>
+      <td>80</td>
+      <td>Comedy,Drama,Fantasy</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 
 - If we add "`index_col=0` to read_csv then it will use this unnamed column as our index, which is the ideal solution.
@@ -212,9 +1058,342 @@ pd.read_csv(fname, index_col=0)
 ```
 
 
-    
-![png](Images/output_24_0.png)
-    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>tconst</th>
+      <th>titleType</th>
+      <th>primaryTitle</th>
+      <th>originalTitle</th>
+      <th>isAdult</th>
+      <th>startYear</th>
+      <th>endYear</th>
+      <th>runtimeMinutes</th>
+      <th>genres</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>13079</th>
+      <td>tt0013274</td>
+      <td>movie</td>
+      <td>Istoriya grazhdanskoy voyny</td>
+      <td>Istoriya grazhdanskoy voyny</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>133</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>33790</th>
+      <td>tt0034413</td>
+      <td>short</td>
+      <td>Youth Gets a Break</td>
+      <td>Youth Gets a Break</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>20</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>34790</th>
+      <td>tt0035423</td>
+      <td>movie</td>
+      <td>Kate &amp; Leopold</td>
+      <td>Kate &amp; Leopold</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>118</td>
+      <td>Comedy,Fantasy,Romance</td>
+    </tr>
+    <tr>
+      <th>39532</th>
+      <td>tt0040241</td>
+      <td>short</td>
+      <td>Color Rhapsodie</td>
+      <td>Color Rhapsodie</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>43536</th>
+      <td>tt0044326</td>
+      <td>short</td>
+      <td>Abstronic</td>
+      <td>Abstronic</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>44078</th>
+      <td>tt0044879</td>
+      <td>short</td>
+      <td>Mandala</td>
+      <td>Mandala</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>3</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>55738</th>
+      <td>tt0056840</td>
+      <td>short</td>
+      <td>Aufsätze</td>
+      <td>Aufsätze</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>10</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>59185</th>
+      <td>tt0060366</td>
+      <td>short</td>
+      <td>A Embalagem de Vidro</td>
+      <td>A Embalagem de Vidro</td>
+      <td>0</td>
+      <td>2020.0</td>
+      <td>NaN</td>
+      <td>11</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>61089</th>
+      <td>tt0062336</td>
+      <td>movie</td>
+      <td>The Tango of the Widower and Its Distorting Mi...</td>
+      <td>El Tango del Viudo y Su Espejo Deformante</td>
+      <td>0</td>
+      <td>2020.0</td>
+      <td>NaN</td>
+      <td>70</td>
+      <td>Drama</td>
+    </tr>
+    <tr>
+      <th>63720</th>
+      <td>tt0065047</td>
+      <td>short</td>
+      <td>The Sun's Gonna Shine</td>
+      <td>The Sun's Gonna Shine</td>
+      <td>0</td>
+      <td>2014.0</td>
+      <td>NaN</td>
+      <td>10</td>
+      <td>Documentary,Music,Short</td>
+    </tr>
+    <tr>
+      <th>65857</th>
+      <td>tt0067230</td>
+      <td>short</td>
+      <td>I Miss Sonia Henie</td>
+      <td>I Miss Sonia Henie</td>
+      <td>0</td>
+      <td>2009.0</td>
+      <td>NaN</td>
+      <td>20</td>
+      <td>Comedy,Short</td>
+    </tr>
+    <tr>
+      <th>66247</th>
+      <td>tt0067626</td>
+      <td>short</td>
+      <td>Before the Rally</td>
+      <td>Przed rajdem</td>
+      <td>0</td>
+      <td>2006.0</td>
+      <td>NaN</td>
+      <td>16</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>66304</th>
+      <td>tt0067683</td>
+      <td>movie</td>
+      <td>Workers '71: Nothing About Us Without Us</td>
+      <td>Robotnicy 1971 - Nic o nas bez nas</td>
+      <td>0</td>
+      <td>2006.0</td>
+      <td>NaN</td>
+      <td>47</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>67531</th>
+      <td>tt0068943</td>
+      <td>short</td>
+      <td>Between Wroclaw and Zielona Góra</td>
+      <td>Miedzy Wroclawiem a Zielona Góra</td>
+      <td>0</td>
+      <td>2010.0</td>
+      <td>NaN</td>
+      <td>11</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>67635</th>
+      <td>tt0069049</td>
+      <td>movie</td>
+      <td>The Other Side of the Wind</td>
+      <td>The Other Side of the Wind</td>
+      <td>0</td>
+      <td>2018.0</td>
+      <td>NaN</td>
+      <td>122</td>
+      <td>Drama</td>
+    </tr>
+    <tr>
+      <th>70534</th>
+      <td>tt0072043</td>
+      <td>short</td>
+      <td>X-Ray</td>
+      <td>Przeswietlenie</td>
+      <td>0</td>
+      <td>2006.0</td>
+      <td>NaN</td>
+      <td>13</td>
+      <td>Documentary,Short</td>
+    </tr>
+    <tr>
+      <th>77929</th>
+      <td>tt0079644</td>
+      <td>movie</td>
+      <td>November 1828</td>
+      <td>November 1828</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>140</td>
+      <td>Drama,War</td>
+    </tr>
+    <tr>
+      <th>86766</th>
+      <td>tt0088751</td>
+      <td>movie</td>
+      <td>The Naked Monster</td>
+      <td>The Naked Monster</td>
+      <td>0</td>
+      <td>2005.0</td>
+      <td>NaN</td>
+      <td>100</td>
+      <td>Comedy,Horror,Sci-Fi</td>
+    </tr>
+    <tr>
+      <th>87078</th>
+      <td>tt0089067</td>
+      <td>movie</td>
+      <td>El día de los albañiles 2</td>
+      <td>El día de los albañiles 2</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>90</td>
+      <td>Comedy</td>
+    </tr>
+    <tr>
+      <th>87435</th>
+      <td>tt0089435</td>
+      <td>short</td>
+      <td>Kokoa</td>
+      <td>Kokoa</td>
+      <td>0</td>
+      <td>2019.0</td>
+      <td>NaN</td>
+      <td>13</td>
+      <td>Animation,Short</td>
+    </tr>
+    <tr>
+      <th>90881</th>
+      <td>tt0092960</td>
+      <td>movie</td>
+      <td>En tres y dos</td>
+      <td>En tres y dos</td>
+      <td>0</td>
+      <td>2004.0</td>
+      <td>NaN</td>
+      <td>102</td>
+      <td>Drama</td>
+    </tr>
+    <tr>
+      <th>92731</th>
+      <td>tt0094859</td>
+      <td>movie</td>
+      <td>Chief Zabu</td>
+      <td>Chief Zabu</td>
+      <td>0</td>
+      <td>2016.0</td>
+      <td>NaN</td>
+      <td>74</td>
+      <td>Comedy</td>
+    </tr>
+    <tr>
+      <th>93902</th>
+      <td>tt0096056</td>
+      <td>movie</td>
+      <td>Crime and Punishment</td>
+      <td>Crime and Punishment</td>
+      <td>0</td>
+      <td>2002.0</td>
+      <td>NaN</td>
+      <td>126</td>
+      <td>Drama</td>
+    </tr>
+    <tr>
+      <th>95113</th>
+      <td>tt0097304</td>
+      <td>movie</td>
+      <td>Everything's for You</td>
+      <td>Everything's for You</td>
+      <td>0</td>
+      <td>2009.0</td>
+      <td>NaN</td>
+      <td>58</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>98005</th>
+      <td>tt0100275</td>
+      <td>movie</td>
+      <td>The Wandering Soap Opera</td>
+      <td>La Telenovela Errante</td>
+      <td>0</td>
+      <td>2017.0</td>
+      <td>NaN</td>
+      <td>80</td>
+      <td>Comedy,Drama,Fantasy</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 
 ### Constructing the Loop
@@ -247,14 +1426,12 @@ for temp_df in df_reader:
     ## Eliminate movies that are null for runtimeMinute, genres, and startYear
     temp_df = temp_df.dropna(subset=['runtimeMinutes','genres','startYear'])
     
-    ## keep only titleType==Movie
-    temp_df = temp_df.loc[ temp_df['titleType']=='movie']
+    
+    
+    ## NOTE: THERE ARE ADDITIONAL REQUIRED FILTERING STEPS FOR THE PROJECT NOT SHOWN HERE
 
-    ## Eliminate movies that include  "Documentary" in genre 
-    is_documentary = temp_df['genres'].str.contains('documentary',case=False)
-    temp_df = temp_df[~is_documentary]
-    temp_df.head()
-
+    
+    
     ### Convert startyear to numeric for slicing
     ## convert numeric features
     temp_df['startYear'] = temp_df['startYear'].astype(float)
@@ -449,9 +1626,175 @@ df_combined
 ```
 
 
-    
-![png](Images/output_38_0.png)
-    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>tconst</th>
+      <th>titleType</th>
+      <th>primaryTitle</th>
+      <th>originalTitle</th>
+      <th>isAdult</th>
+      <th>startYear</th>
+      <th>endYear</th>
+      <th>runtimeMinutes</th>
+      <th>genres</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>13079</th>
+      <td>tt0013274</td>
+      <td>movie</td>
+      <td>Istoriya grazhdanskoy voyny</td>
+      <td>Istoriya grazhdanskoy voyny</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>133</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>33790</th>
+      <td>tt0034413</td>
+      <td>short</td>
+      <td>Youth Gets a Break</td>
+      <td>Youth Gets a Break</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>20</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>34790</th>
+      <td>tt0035423</td>
+      <td>movie</td>
+      <td>Kate &amp; Leopold</td>
+      <td>Kate &amp; Leopold</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>118</td>
+      <td>Comedy,Fantasy,Romance</td>
+    </tr>
+    <tr>
+      <th>39532</th>
+      <td>tt0040241</td>
+      <td>short</td>
+      <td>Color Rhapsodie</td>
+      <td>Color Rhapsodie</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>43536</th>
+      <td>tt0044326</td>
+      <td>short</td>
+      <td>Abstronic</td>
+      <td>Abstronic</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>9163345</th>
+      <td>tt9916754</td>
+      <td>movie</td>
+      <td>Chico Albuquerque - Revelações</td>
+      <td>Chico Albuquerque - Revelações</td>
+      <td>0</td>
+      <td>2013.0</td>
+      <td>NaN</td>
+      <td>49</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>9163351</th>
+      <td>tt9916766</td>
+      <td>tvEpisode</td>
+      <td>Episode #10.15</td>
+      <td>Episode #10.15</td>
+      <td>0</td>
+      <td>2019.0</td>
+      <td>NaN</td>
+      <td>43</td>
+      <td>Family,Game-Show,Reality-TV</td>
+    </tr>
+    <tr>
+      <th>9163386</th>
+      <td>tt9916840</td>
+      <td>tvEpisode</td>
+      <td>Horrid Henry's Comic Caper</td>
+      <td>Horrid Henry's Comic Caper</td>
+      <td>0</td>
+      <td>2014.0</td>
+      <td>NaN</td>
+      <td>11</td>
+      <td>Adventure,Animation,Comedy</td>
+    </tr>
+    <tr>
+      <th>9163393</th>
+      <td>tt9916856</td>
+      <td>short</td>
+      <td>The Wind</td>
+      <td>The Wind</td>
+      <td>0</td>
+      <td>2015.0</td>
+      <td>NaN</td>
+      <td>27</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>9163394</th>
+      <td>tt9916880</td>
+      <td>tvEpisode</td>
+      <td>Horrid Henry Knows It All</td>
+      <td>Horrid Henry Knows It All</td>
+      <td>0</td>
+      <td>2014.0</td>
+      <td>NaN</td>
+      <td>10</td>
+      <td>Adventure,Animation,Comedy</td>
+    </tr>
+  </tbody>
+</table>
+<p>1703471 rows × 9 columns</p>
+</div>
+
 
 
 #### List Comprehension Way
@@ -464,9 +1807,175 @@ df_combined
 ```
 
 
-    
-![png](Images/output_40_0.png)
-    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>tconst</th>
+      <th>titleType</th>
+      <th>primaryTitle</th>
+      <th>originalTitle</th>
+      <th>isAdult</th>
+      <th>startYear</th>
+      <th>endYear</th>
+      <th>runtimeMinutes</th>
+      <th>genres</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>13079</th>
+      <td>tt0013274</td>
+      <td>movie</td>
+      <td>Istoriya grazhdanskoy voyny</td>
+      <td>Istoriya grazhdanskoy voyny</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>133</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>33790</th>
+      <td>tt0034413</td>
+      <td>short</td>
+      <td>Youth Gets a Break</td>
+      <td>Youth Gets a Break</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>20</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>34790</th>
+      <td>tt0035423</td>
+      <td>movie</td>
+      <td>Kate &amp; Leopold</td>
+      <td>Kate &amp; Leopold</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>118</td>
+      <td>Comedy,Fantasy,Romance</td>
+    </tr>
+    <tr>
+      <th>39532</th>
+      <td>tt0040241</td>
+      <td>short</td>
+      <td>Color Rhapsodie</td>
+      <td>Color Rhapsodie</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>43536</th>
+      <td>tt0044326</td>
+      <td>short</td>
+      <td>Abstronic</td>
+      <td>Abstronic</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>9163345</th>
+      <td>tt9916754</td>
+      <td>movie</td>
+      <td>Chico Albuquerque - Revelações</td>
+      <td>Chico Albuquerque - Revelações</td>
+      <td>0</td>
+      <td>2013.0</td>
+      <td>NaN</td>
+      <td>49</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>9163351</th>
+      <td>tt9916766</td>
+      <td>tvEpisode</td>
+      <td>Episode #10.15</td>
+      <td>Episode #10.15</td>
+      <td>0</td>
+      <td>2019.0</td>
+      <td>NaN</td>
+      <td>43</td>
+      <td>Family,Game-Show,Reality-TV</td>
+    </tr>
+    <tr>
+      <th>9163386</th>
+      <td>tt9916840</td>
+      <td>tvEpisode</td>
+      <td>Horrid Henry's Comic Caper</td>
+      <td>Horrid Henry's Comic Caper</td>
+      <td>0</td>
+      <td>2014.0</td>
+      <td>NaN</td>
+      <td>11</td>
+      <td>Adventure,Animation,Comedy</td>
+    </tr>
+    <tr>
+      <th>9163393</th>
+      <td>tt9916856</td>
+      <td>short</td>
+      <td>The Wind</td>
+      <td>The Wind</td>
+      <td>0</td>
+      <td>2015.0</td>
+      <td>NaN</td>
+      <td>27</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>9163394</th>
+      <td>tt9916880</td>
+      <td>tvEpisode</td>
+      <td>Horrid Henry Knows It All</td>
+      <td>Horrid Henry Knows It All</td>
+      <td>0</td>
+      <td>2014.0</td>
+      <td>NaN</td>
+      <td>10</td>
+      <td>Adventure,Animation,Comedy</td>
+    </tr>
+  </tbody>
+</table>
+<p>1703471 rows × 9 columns</p>
+</div>
+
 
 
 - And now we can save this single dataframe as the final combined file we will use going forward.
@@ -485,9 +1994,175 @@ df_combined
 ```
 
 
-    
-![png](Images/output_43_0.png)
-    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>tconst</th>
+      <th>titleType</th>
+      <th>primaryTitle</th>
+      <th>originalTitle</th>
+      <th>isAdult</th>
+      <th>startYear</th>
+      <th>endYear</th>
+      <th>runtimeMinutes</th>
+      <th>genres</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>tt0013274</td>
+      <td>movie</td>
+      <td>Istoriya grazhdanskoy voyny</td>
+      <td>Istoriya grazhdanskoy voyny</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>133</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>tt0034413</td>
+      <td>short</td>
+      <td>Youth Gets a Break</td>
+      <td>Youth Gets a Break</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>20</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>tt0035423</td>
+      <td>movie</td>
+      <td>Kate &amp; Leopold</td>
+      <td>Kate &amp; Leopold</td>
+      <td>0</td>
+      <td>2001.0</td>
+      <td>NaN</td>
+      <td>118</td>
+      <td>Comedy,Fantasy,Romance</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>tt0040241</td>
+      <td>short</td>
+      <td>Color Rhapsodie</td>
+      <td>Color Rhapsodie</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>tt0044326</td>
+      <td>short</td>
+      <td>Abstronic</td>
+      <td>Abstronic</td>
+      <td>0</td>
+      <td>2021.0</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1703466</th>
+      <td>tt9916754</td>
+      <td>movie</td>
+      <td>Chico Albuquerque - Revelações</td>
+      <td>Chico Albuquerque - Revelações</td>
+      <td>0</td>
+      <td>2013.0</td>
+      <td>NaN</td>
+      <td>49</td>
+      <td>Documentary</td>
+    </tr>
+    <tr>
+      <th>1703467</th>
+      <td>tt9916766</td>
+      <td>tvEpisode</td>
+      <td>Episode #10.15</td>
+      <td>Episode #10.15</td>
+      <td>0</td>
+      <td>2019.0</td>
+      <td>NaN</td>
+      <td>43</td>
+      <td>Family,Game-Show,Reality-TV</td>
+    </tr>
+    <tr>
+      <th>1703468</th>
+      <td>tt9916840</td>
+      <td>tvEpisode</td>
+      <td>Horrid Henry's Comic Caper</td>
+      <td>Horrid Henry's Comic Caper</td>
+      <td>0</td>
+      <td>2014.0</td>
+      <td>NaN</td>
+      <td>11</td>
+      <td>Adventure,Animation,Comedy</td>
+    </tr>
+    <tr>
+      <th>1703469</th>
+      <td>tt9916856</td>
+      <td>short</td>
+      <td>The Wind</td>
+      <td>The Wind</td>
+      <td>0</td>
+      <td>2015.0</td>
+      <td>NaN</td>
+      <td>27</td>
+      <td>Short</td>
+    </tr>
+    <tr>
+      <th>1703470</th>
+      <td>tt9916880</td>
+      <td>tvEpisode</td>
+      <td>Horrid Henry Knows It All</td>
+      <td>Horrid Henry Knows It All</td>
+      <td>0</td>
+      <td>2014.0</td>
+      <td>NaN</td>
+      <td>10</td>
+      <td>Adventure,Animation,Comedy</td>
+    </tr>
+  </tbody>
+</table>
+<p>1703471 rows × 9 columns</p>
+</div>
+
 
 
 # APPENDIX
@@ -517,7 +2192,7 @@ def get_memory_usage(df,units='mb'):
 get_memory_usage(df_combined)
 ```
 
-    - Total Memory Usage = 9.841376 MB
+    - Total Memory Usage = 122.65004 MB
 
 
 
@@ -544,7 +2219,7 @@ def get_filesize(fname, units='mb'):
 get_filesize(final_fname)
 ```
 
-    - Data/title_basics_combined.csv.gz is 3.116348 MB on disk.
+    - Data/title_basics_combined.csv.gz is 37.488613 MB on disk.
 
 
 
